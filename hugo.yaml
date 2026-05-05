@@ -67,7 +67,7 @@ params:
     # light | dark | system
     default: system
     displayToggle: true
-    
+
   # Display the last modification info
   displayUpdatedDate: true
   dateFormat: "January 2, 2006"
@@ -120,23 +120,14 @@ params:
     #   sync: true
 
   comments:
-    enable: false
-    type: giscus
+    enable: true
+    type: twikoo
 
-    # https://giscus.app/
-    giscus:
-      repo: shafeiyu/library
-      repoId: R_kgDOSS-gng
-      category: Announcements
-      categoryId: DIC_kwDOSS-gns4C8POT
-      mapping: title
-      strict: 0
-      reactionsEnabled: 1
-      emitMetadata: 1
-      inputPosition: top
+    # https://twikoo.js.org/
+    twikoo:
+      # 替换为你的 LeanCloud 环境 ID，从 https://console.leancloud.cn 获取
+      envId: twikoo.mioz.life
       lang: zh-CN
-      loading: lazy
-      theme: noborder_light
 
   imageZoom:
     enable: true

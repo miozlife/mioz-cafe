@@ -1,0 +1,26 @@
+{{- $lang := site.Language.Lang | default `zh-CN` -}}
+{{- if hasPrefix $lang "zh" -}}
+  {{- $lang = site.Language.LanguageCode | default `zh-CN` -}}
+{{- end -}}
+
+{{- with site.Params.comments.twikoo -}}
+<script src="https://cdn.jsdelivr.net/npm/twikoo@latest/dist/twikoo.all.min.js" crossorigin="anonymous"></script>
+
+<div id="twikoo-hextra"></div>
+
+<script>
+  twikoo.init({
+    envId: "{{ .envId }}",
+    el: "#twikoo-hextra",
+    lang: "{{ .lang | default $lang }}",
+    {{- with .path }}path: "{{ . }}",{{- else }}path: window.location.pathname,{{- end }}
+    {{- with .region }}region: "{{ . }}",{{- end }}
+    onCommentLoaded: function () {
+      // Twikoo uses its own theme detection, but we can hook into
+      // the Hextra theme toggle to keep Twikoo in sync.
+    }
+  });
+</script>
+{{- else -}}
+  {{ warnf "twikoo is not configured. Set params.comments.twikoo.envId in hugo.yaml" }}
+{{- end -}}
