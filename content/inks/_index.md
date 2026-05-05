@@ -1,7 +1,9 @@
 ---
 title: 随笔
-next: 
+cascade:
+  type: blogs
 ---
 
-随笔目录
+随笔
+
 

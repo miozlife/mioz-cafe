@@ -1,8 +1,6 @@
 ---
-title: Demo Page
-type: docs
-prev: /
-next: docs/folder/
+title: 测试页面
+type: blog
 ---
 
 A simple demo page.
