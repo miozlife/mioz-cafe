@@ -45,7 +45,6 @@ params:
       width: 20
       height: 20
       link: /
-    width: wide
 
   footer:
     displayCopyright: true
@@ -109,7 +108,7 @@ params:
 
   page:
     # full (100%), wide (90rem), normal (80rem)
-    width: normal
+    width: wide
     contextMenu:
       enable: true
       links:

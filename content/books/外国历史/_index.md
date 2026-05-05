@@ -1,8 +1,6 @@
 ---
 title: 外国历史
 type: docs
-sidebar:
-  open: true
 ---
 
 <!-- AUTO_GENERATED_CARDS -->

@@ -1,8 +1,6 @@
 ---
 title: 外国经典文学
 type: docs
-sidebar:
-  open: true
 ---
 
 <!-- AUTO_GENERATED_CARDS -->

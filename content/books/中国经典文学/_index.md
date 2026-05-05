@@ -3,8 +3,6 @@ title: 文学
 type: docs
 prev: docs/first-page
 next: docs/folder/leaf
-sidebar:
-  open: true
 ---
 
 <!-- AUTO_GENERATED_CARDS -->

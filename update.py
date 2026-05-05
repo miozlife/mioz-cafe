@@ -207,12 +207,14 @@ def read_front_matter(index_path: Path) -> list[str]:
 
 
 def default_front_matter(title: str) -> list[str]:
-    return ["---", f"title: {title}", "type: docs", "sidebar:", "  open: true", "---"]
+    return ["---", f"title: {title}", "type: docs", "---"]
 
 
 def write_index_md(index_path: Path, fm_lines: list[str], card_lines: list[str]):
     """Write _index.md with front matter and card grid."""
-    out = list(fm_lines) if fm_lines else default_front_matter(index_path.parent.name)
+    # Strip sidebar.open from preserved front matter (sidebar closed by default)
+    fm = [line for line in fm_lines if "sidebar:" not in line and "open: true" not in line]
+    out = fm if fm else default_front_matter(index_path.parent.name)
     out.append("")
     out.append(MARKER_CARDS)
     out.append("")
