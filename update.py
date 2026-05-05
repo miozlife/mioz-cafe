@@ -186,94 +186,121 @@ def make_slug(filename: str) -> str:
     return slug
 
 
+def read_front_matter(index_path: Path) -> list[str]:
+    """Read front matter lines from _index.md, or empty list if absent."""
+    if not index_path.exists():
+        return []
+    content = index_path.read_text(encoding="utf-8")
+    lines = content.splitlines()
+    i = 0
+    fm_lines = []
+    if lines and lines[0].strip() == "---":
+        fm_lines.append(lines[0])
+        i = 1
+        while i < len(lines):
+            fm_lines.append(lines[i])
+            if lines[i].strip() == "---":
+                i += 1
+                break
+            i += 1
+    return fm_lines
+
+
+def default_front_matter(title: str) -> list[str]:
+    return ["---", f"title: {title}", "type: docs", "sidebar:", "  open: true", "---"]
+
+
+def write_index_md(index_path: Path, fm_lines: list[str], card_lines: list[str]):
+    """Write _index.md with front matter and card grid."""
+    out = list(fm_lines) if fm_lines else default_front_matter(index_path.parent.name)
+    out.append("")
+    out.append(MARKER_CARDS)
+    out.append("")
+    if card_lines:
+        cols = min(len(card_lines), 4)
+        out.append(f"{{{{< cards cols=\"{cols}\" >}}}}")
+        out.extend(card_lines)
+        out.append("{{< /cards >}}")
+    else:
+        out.append("该目录下暂无内容。")
+    result = "\n".join(out) + "\n"
+    index_path.write_text(result, encoding="utf-8")
+
+
 def sync_index_md():
-    """For each content directory containing EPUBs, update _index.md with cards."""
+    """Sync _index.md for EPUB directories (with covers) and subdir-only directories (text cards)."""
     epubs = sorted(CONTENT_DIR.rglob("*.epub"))
-    dirs = sorted({epub.parent for epub in epubs})
+    epub_dirs = {epub.parent for epub in epubs}
+
+    # Collect all content dirs that need syncing: EPUB dirs + their ancestor dirs
+    all_dirs = set(epub_dirs)
+    for d in epub_dirs:
+        p = d.parent
+        while p != CONTENT_DIR:
+            all_dirs.add(p)
+            p = p.parent
+
+    # Also include dirs with subdirs but no EPUBs (e.g. new empty categories)
+    for d in CONTENT_DIR.rglob("*"):
+        if d.is_dir() and d != CONTENT_DIR:
+            subdirs = [x for x in d.iterdir() if x.is_dir()]
+            if subdirs:
+                all_dirs.add(d)
 
     print("Syncing _index.md with card grids...")
     print()
 
-    for dir_path in dirs:
+    for dir_path in sorted(all_dirs):
         epub_files = sorted(dir_path.glob("*.epub"))
-        if not epub_files:
+        subdirs = sorted(x for x in dir_path.iterdir() if x.is_dir())
+
+        if not epub_files and not subdirs:
             continue
 
         index_path = dir_path / "_index.md"
-        print(f"  {dir_path.relative_to(PROJECT_ROOT)}/ ({len(epub_files)} book(s))")
+        rel = dir_path.relative_to(PROJECT_ROOT)
+        fm_lines = read_front_matter(index_path)
 
-        # Read existing front matter
-        fm_lines = []
-        if index_path.exists():
-            content = index_path.read_text(encoding="utf-8")
-            lines = content.splitlines()
-            i = 0
-            if lines and lines[0].strip() == "---":
-                fm_lines.append(lines[0])
-                i = 1
-                while i < len(lines):
-                    fm_lines.append(lines[i])
-                    if lines[i].strip() == "---":
-                        i += 1
-                        break
-                    i += 1
-
-        books = []
-        for epub_path in epub_files:
-            info = extract_epub_info(epub_path)
-            if not info:
-                continue
-
-            cover_url = save_cover(info["cover_data"], epub_path.stem, info["cover_mime"])
-            display_title = short_title(epub_path.name)
-            books.append({
-                "epub_stem": epub_path.stem,
-                "title": display_title,
-                "cover_url": cover_url,
-            })
-
-        # Build output
-        out = []
-        if fm_lines:
-            out.extend(fm_lines)
-        else:
-            out.extend([
-                "---",
-                f"title: {dir_path.name}",
-                "type: docs",
-                "sidebar:",
-                "  open: true",
-                "---",
-            ])
-
-        out.append("")
-        out.append(MARKER_CARDS)
-
-        if books:
-            cols = min(len(books), 4)
-            out.append("")
-            out.append(f"{{{{< cards cols=\"{cols}\" >}}}}")
-            for book in books:
-                slug = make_slug(book["epub_stem"])
+        if epub_files:
+            # EPUB-containing directory: cards with covers
+            print(f"  {rel}/ ({len(epub_files)} book(s))")
+            card_lines = []
+            for epub_path in epub_files:
+                info = extract_epub_info(epub_path)
+                if not info:
+                    continue
+                cover_url = save_cover(info["cover_data"], epub_path.stem, info["cover_mime"])
+                display_title = short_title(epub_path.name)
+                slug = make_slug(epub_path.stem)
                 link = f"./{slug}/"
-                if book["cover_url"]:
-                    out.append(
-                        f'  {{{{< card link="{link}" title="{book["title"]}" '
-                        f'image="{book["cover_url"]}" '
+                if cover_url:
+                    card_lines.append(
+                        f'  {{{{< card link="{link}" title="{display_title}" '
+                        f'image="{cover_url}" '
                         f'imageStyle="max-height:180px;object-fit:contain" >}}}}'
                     )
                 else:
-                    out.append(
-                        f'  {{{{< card link="{link}" title="{book["title"]}" >}}}}'
+                    card_lines.append(
+                        f'  {{{{< card link="{link}" title="{display_title}" >}}}}'
                     )
-            out.append("{{< /cards >}}")
-        else:
-            out.append("")
-            out.append("该目录下暂无书籍。")
+            write_index_md(index_path, fm_lines, card_lines)
+            print(f"    Updated ({len(card_lines)} cards)")
 
-        result = "\n".join(out) + "\n"
-        index_path.write_text(result, encoding="utf-8")
-        print(f"    Updated ({len(books)} cards)")
+        elif subdirs and not epub_files:
+            # Subdirectory-only directory: text cards linking to child dirs
+            print(f"  {rel}/ ({len(subdirs)} section(s))")
+            card_lines = []
+            for sd in subdirs:
+                # Skip hidden dirs and non-content dirs
+                if sd.name.startswith("."):
+                    continue
+                slug = make_slug(sd.name)
+                link = f"./{slug}/"
+                card_lines.append(
+                    f'  {{{{< card link="{link}" title="{sd.name}" >}}}}'
+                )
+            write_index_md(index_path, fm_lines, card_lines)
+            print(f"    Updated ({len(card_lines)} cards)")
 
     print()
 
