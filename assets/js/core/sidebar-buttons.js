@@ -10,6 +10,15 @@ document.addEventListener("DOMContentLoaded", function () {
       jumpToCommentsBtn.style.display = "none";
     }
   }
+
+  // Always show backToTop button, override the theme's scroll-based toggle
+  const backToTopBtn = document.getElementById("backToTop");
+  if (backToTopBtn) {
+    document.addEventListener("scroll", function () {
+      backToTopBtn.classList.remove("hx:opacity-0");
+      backToTopBtn.removeAttribute("tabindex");
+    });
+  }
 });
 
 function sidebarJumpToComments() {
