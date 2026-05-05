@@ -8,7 +8,8 @@
 
 <nav class="hextra-toc hx:order-last hx:hidden hx:w-64 hx:shrink-0 hx:xl:block hx:print:hidden hx:px-4" aria-label="{{ (T "tableOfContents") | default "Table of contents" }}">
   {{- if $toc }}
-    <div class="hx:sticky hx:top-16 hx:pt-6 hx:text-sm hx:overflow-hidden hx:flex hx:flex-col" style="height:calc(100vh - var(--navbar-height) - var(--menu-height) - 2rem - env(safe-area-inset-bottom))">
+    <div class="hx:sticky hx:top-16">
+      <div class="hx:pt-6 hx:text-sm hx:flex hx:flex-col hx:overflow-hidden" style="height:calc(100vh - var(--navbar-height) - var(--menu-height) - 2rem - env(safe-area-inset-bottom))">
       {{- with .Fragments.Headings -}}
         <div class="hextra-scrollbar hx:overflow-y-auto hx:flex-1 hx:min-h-0 hx:pr-4 hx:ltr:-mr-4 hx:rtl:-ml-4 [hyphens:auto]">
           <p class="hx:mb-4 hx:font-semibold hx:tracking-tight">{{ $onThisPage }}</p>
@@ -62,6 +63,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
         </button>
+      </div>
       </div>
     </div>
   {{ end -}}
