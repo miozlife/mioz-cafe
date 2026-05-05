@@ -1,5 +1,5 @@
 ---
-title: 文学
+title: 中国经典文学
 type: docs
 prev: docs/first-page
 next: docs/folder/leaf
