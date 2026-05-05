@@ -185,7 +185,7 @@ def generate_index_md(directory: Path, books: list[dict]):
         cover_url = book.get("cover_url", "")
         if cover_url:
             card_lines.append(
-                f'  {{{{< card link="{link}" title="{title}" image="{cover_url}" imageStyle="max-height:200px;object-fit:cover" >}}}}'
+                f'  {{{{< card link="{link}" title="{title}" image="{cover_url}" imageStyle="max-height:180px;object-fit:contain" >}}}}'
             )
         else:
             card_lines.append(
@@ -211,8 +211,9 @@ def generate_index_md(directory: Path, books: list[dict]):
     out.append(MARKER)
 
     if card_lines:
+        cols = min(len(books), 4)
         out.append("")
-        out.append("{{< cards >}}")
+        out.append(f"{{{{< cards cols=\"{cols}\" >}}}}")
         out.extend(card_lines)
         out.append("{{< /cards >}}")
     else:
