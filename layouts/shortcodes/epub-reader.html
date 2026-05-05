@@ -8,7 +8,6 @@
   <div class="epub-viewer" id="epub-viewer-{{ $uid }}"></div>
   <div class="epub-controls">
     <button class="epub-btn" id="epub-prev-{{ $uid }}">← 上一章</button>
-    <span class="epub-progress" id="epub-progress-{{ $uid }}"></span>
     <button class="epub-btn" id="epub-next-{{ $uid }}">下一章 →</button>
   </div>
 </div>
@@ -20,7 +19,6 @@
   var container = document.getElementById("epub-reader-{{ $uid }}");
   var loading   = document.getElementById("epub-loading-{{ $uid }}");
   var viewer    = document.getElementById("epub-viewer-{{ $uid }}");
-  var progress  = document.getElementById("epub-progress-{{ $uid }}");
   var prevBtn   = document.getElementById("epub-prev-{{ $uid }}");
   var nextBtn   = document.getElementById("epub-next-{{ $uid }}");
 
@@ -52,7 +50,6 @@
   }).then(function() {
     autoResizeIframe();
     setupResizeObserver();
-    updateProgress();
     return book.loaded.navigation;
   }).then(function(nav) {
     var tocItems = nav.toc || (Array.isArray(nav) ? nav : []);
@@ -218,41 +215,10 @@
     });
   });
 
-  // ---- Progress tracking ----
-  function updateProgress() {
-    if (!progress || !container) return;
-    // Calculate progress based on scroll position within the EPUB container
-    var rect = container.getBoundingClientRect();
-    var containerH = container.offsetHeight;
-    var viewH = window.innerHeight;
-    var scrolled = Math.max(0, -rect.top);
-    var total = containerH - viewH + rect.top;
-    if (total <= 0) {
-      progress.textContent = "0%";
-      return;
-    }
-    var pct = Math.min(100, Math.max(0, Math.floor((scrolled / total) * 100)));
-    progress.textContent = pct + "%";
-  }
-
-  // Update progress on scroll
-  var scrollTimer;
-  window.addEventListener("scroll", function() {
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(updateProgress, 50);
-  });
-
   rendition.on("relocated", function(location) {
-    // Try epub.js location first, fall back to scroll-based
-    if (location && location.start && typeof location.start.percentage === 'number') {
-      progress.textContent = Math.floor(location.start.percentage * 100) + "%";
-    }
     highlightTocChapter(location);
     // Recalculate iframe height after section change
-    setTimeout(function() {
-      autoResizeIframe();
-      updateProgress();
-    }, 150);
+    setTimeout(autoResizeIframe, 150);
   });
 
   function highlightTocChapter(location) {
@@ -347,13 +313,6 @@
 .epub-btn:disabled {
   opacity: 0.4;
   cursor: default;
-}
-
-.epub-progress {
-  font-size: 0.85rem;
-  color: var(--gray-600, #4b5563);
-  min-width: 3rem;
-  text-align: center;
 }
 
 /* ---- epub TOC in right sidebar ---- */
