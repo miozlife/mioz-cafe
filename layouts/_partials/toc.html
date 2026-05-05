@@ -6,11 +6,11 @@
 {{- $editThisPage := (T "editThisPage") | default "Edit this page"}}
 {{- $backToTop := (T "backToTop") | default "Scroll to top" -}}
 
-<nav class="hextra-toc hx:order-last hx:hidden hx:w-64 hx:shrink-0 hx:xl:flex hx:xl:flex-col hx:print:hidden hx:px-4 hx:sticky hx:top-16" style="max-height:calc(100vh - var(--navbar-height))" aria-label="{{ (T "tableOfContents") | default "Table of contents" }}">
+<nav class="hextra-toc hx:order-last hx:hidden hx:w-64 hx:shrink-0 hx:xl:block hx:print:hidden hx:px-4 hx:sticky hx:top-16 hx:overflow-hidden" style="max-height:calc(100vh - var(--navbar-height) - 2rem)" aria-label="{{ (T "tableOfContents") | default "Table of contents" }}">
   {{- if $toc }}
-    <div class="hx:pt-6 hx:text-sm hx:flex-1 hx:min-h-0 hx:flex hx:flex-col">
+    <div class="hextra-toc-scroll-wrapper hx:pt-6 hx:text-sm">
       {{- with .Fragments.Headings -}}
-        <div class="hextra-scrollbar hx:overflow-y-auto hx:flex-1 hx:min-h-0 hx:pr-4 hx:ltr:-mr-4 hx:rtl:-ml-4 [hyphens:auto]">
+        <div class="hextra-scrollbar hx:overflow-y-auto hx:h-full hx:pr-4 hx:ltr:-mr-4 hx:rtl:-ml-4 [hyphens:auto]">
           <p class="hx:mb-4 hx:font-semibold hx:tracking-tight">{{ $onThisPage }}</p>
           {{- range . -}}
             <ul>
@@ -19,11 +19,11 @@
           {{- end -}}
         </div>
       {{- else -}}
-        <div class="hextra-scrollbar hx:overflow-y-auto hx:flex-1 hx:min-h-0 hx:pr-4 hx:ltr:-mr-4 hx:rtl:-ml-4 [hyphens:auto]"></div>
+        <div class="hextra-scrollbar hx:overflow-y-auto hx:h-full hx:pr-4 hx:ltr:-mr-4 hx:rtl:-ml-4 [hyphens:auto]"></div>
       {{- end -}}
     </div>
 
-    {{/* Back to top - below scroll area, always visible */}}
+    {{/* Back to top - always pinned at bottom */}}
     <div class="hx:shrink-0 hx:flex hx:items-center hx:justify-center hx:py-2 hx:border-t hx:border-gray-200 hx:dark:border-neutral-800">
       <button id="backToTop" onClick="scrollUp();" class="hx:cursor-pointer hx:text-xs hx:font-medium hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-100 hx:contrast-more:text-gray-800 hx:contrast-more:dark:text-gray-50">
         <span>{{- $backToTop -}}</span>
