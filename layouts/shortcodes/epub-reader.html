@@ -195,12 +195,26 @@
     });
   }
 
-  // ---- Navigation: prev = scroll page up, next = scroll page down ----
+  // ---- Navigation: prev/next section via epub.js ----
   prevBtn.addEventListener("click", function() {
-    window.scrollBy({ top: -window.innerHeight * 0.85, behavior: 'smooth' });
+    rendition.prev().then(function() {
+      autoResizeIframe();
+      // Scroll page to top of reader
+      var top = container.getBoundingClientRect().top + window.pageYOffset - 16;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    }).catch(function(err) {
+      console.warn('epub prev failed:', err);
+    });
   });
   nextBtn.addEventListener("click", function() {
-    window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+    rendition.next().then(function() {
+      autoResizeIframe();
+      // Scroll page to top of reader
+      var top = container.getBoundingClientRect().top + window.pageYOffset - 16;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    }).catch(function(err) {
+      console.warn('epub next failed:', err);
+    });
   });
 
   rendition.on("relocated", function(location) {
@@ -208,6 +222,8 @@
       progress.textContent = Math.floor(location.start.percentage * 100) + "%";
     }
     highlightTocChapter(location);
+    // Recalculate iframe height after section change
+    setTimeout(autoResizeIframe, 150);
   });
 
   function highlightTocChapter(location) {
@@ -229,8 +245,20 @@
   // ---- Keyboard ----
   document.addEventListener("keydown", function(e) {
     if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-    if (e.key === "ArrowLeft")  window.scrollBy({ top: -window.innerHeight * 0.5, behavior: 'smooth' });
-    if (e.key === "ArrowRight") window.scrollBy({ top: window.innerHeight * 0.5, behavior: 'smooth' });
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      rendition.prev().then(function() {
+        autoResizeIframe();
+        window.scrollTo({ top: container.getBoundingClientRect().top + window.pageYOffset - 16, behavior: 'smooth' });
+      }).catch(function() {});
+    }
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      rendition.next().then(function() {
+        autoResizeIframe();
+        window.scrollTo({ top: container.getBoundingClientRect().top + window.pageYOffset - 16, behavior: 'smooth' });
+      }).catch(function() {});
+    }
   });
 })();
 </script>
@@ -256,6 +284,7 @@
   display: block;
   width: 100%;
   border: none;
+  min-height: 600px;
 }
 
 /* ---- bottom controls ---- */
