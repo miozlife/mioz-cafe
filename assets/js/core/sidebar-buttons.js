@@ -14,6 +14,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // Always show backToTop button, override the theme's scroll-based toggle
   const backToTopBtn = document.getElementById("backToTop");
   if (backToTopBtn) {
+    // Remove immediately (theme's back-to-top.js may have already added opacity-0)
+    backToTopBtn.classList.remove("hx:opacity-0");
+    backToTopBtn.removeAttribute("tabindex");
+    // Keep removed on every scroll event as well
     document.addEventListener("scroll", function () {
       backToTopBtn.classList.remove("hx:opacity-0");
       backToTopBtn.removeAttribute("tabindex");
