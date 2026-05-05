@@ -34,6 +34,21 @@ menu:
       params:
         type: search
 
+  sidebar:
+    - identifier: more
+      name: 更多
+      params:
+        type: separator
+      weight: 1
+    # - identifier: about
+    #   name: "About"
+    #   pageRef: "/about"
+    #   weight: 2
+    - identifier: discussions
+      name: "Send to kindle ↗"
+      url: "https://www.amazon.com/sendtokindle/"
+      weight: 3
+
 
 params:
   navbar:
