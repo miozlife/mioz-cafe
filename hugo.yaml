@@ -26,7 +26,7 @@ menu:
     - name: 随笔
       pageRef: /inks
       weight: 2
-    - name: 关于
+    - name: 介绍
       pageRef: /intro
       weight: 3
     - name: Search
