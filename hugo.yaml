@@ -60,7 +60,7 @@ params:
   banner:
     key: 'announcement'
     message:
-      🎉 Sha的书架.
+      🎉 欢迎来到 Mioz Cafe!
 
   theme:
     # light | dark | system
