@@ -2,13 +2,13 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   const jumpToCommentsBtn = document.getElementById("sidebarJumpToComments");
+  const tocJumpToCommentsBtn = document.getElementById("tocJumpToComments");
+  const commentsEl = document.getElementById("twikoo-hextra");
 
-  // Jump to comments: hide button if no comments section on the page
-  if (jumpToCommentsBtn) {
-    const commentsEl = document.getElementById("twikoo-hextra");
-    if (!commentsEl) {
-      jumpToCommentsBtn.style.display = "none";
-    }
+  // Jump to comments: hide buttons if no comments section on the page
+  if (!commentsEl) {
+    if (jumpToCommentsBtn) jumpToCommentsBtn.style.display = "none";
+    if (tocJumpToCommentsBtn) tocJumpToCommentsBtn.style.display = "none";
   }
 
   // Always show backToTop button, override the theme's scroll-based toggle
