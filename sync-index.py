@@ -147,8 +147,14 @@ def save_cover(book: dict, epub_stem: str) -> str | None:
 
 
 def make_slug(filename: str) -> str:
-    """Turn a Chinese filename into a sane slug for links."""
-    return filename
+    """Turn a filename into Hugo-compatible slug for links.
+
+    Hugo strips these characters from slugs: ：:（）()
+    """
+    slug = filename
+    for ch in "：:（）()":
+        slug = slug.replace(ch, "")
+    return slug
 
 
 def generate_index_md(directory: Path, books: list[dict]):
