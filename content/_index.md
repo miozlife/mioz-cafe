@@ -1,17 +1,11 @@
 ---
-title: My Site
+title: Sha的书架
 toc: false
 ---
 
-This is the landing page.
-
-## Explore
-
 {{< cards >}}
-  {{< card link="docs" title="Docs" icon="book-open" >}}
-  {{< card link="about" title="About" icon="user" >}}
+  {{< card link="books" title="书架" icon="book-open" >}}
+  {{< card link="inks" title="随笔" icon="pencil" >}}
+  {{< card link="about" title="关于" icon="user" >}}
 {{< /cards >}}
 
-## Documentation
-
-For more information, visit [Hextra](https://imfing.github.io/hextra).

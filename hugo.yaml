@@ -1,5 +1,5 @@
 # Hugo configuration file
-title: My Site
+title: Mioz Cafe
 
 # import hextra as module
 module:
@@ -16,41 +16,132 @@ markup:
   highlight:
     noClasses: false
 
+defaultContentLanguage: 简体中文
+
 menu:
   main:
-    - name: Docs
-      pageRef: /docs
+    - name: 书架
+      pageRef: /books
       weight: 1
-    - name: About
-      pageRef: /about
+    - name: 随笔
+      pageRef: /inks
       weight: 2
-    - name: Contact ↗
-      url: "https://github.com/imfing"
+    - name: 关于
+      pageRef: /about
       weight: 3
     - name: Search
       weight: 4
       params:
         type: search
-    - name: GitHub
-      weight: 5
-      url: "https://github.com/imfing/hextra-starter-template"
-      params:
-        icon: github
-    - name: Twitter
-      weight: 6
-      url: "https://twitter.com/"
-      params:
-        icon: x-twitter
+
 
 params:
   navbar:
     displayTitle: true
-    displayLogo: false
+    displayLogo: true
+    logo:
+      path: /logo.png
+      dark: /logo.png
+      width: 20
+      height: 20
+      link: /
+    width: wide
 
   footer:
-    displayCopyright: false
-    displayPoweredBy: true
+    displayCopyright: true
+    displayPoweredBy: false
 
   editURL:
-    enable: true
+    enable: false
     base: "https://github.com/imfing/hextra-starter-template/edit/main/content"
+
+  description: Sha的书架
+  externalLinkDecoration: true
+
+  banner:
+    key: 'announcement'
+    message:
+      🎉 Sha的书架.
+
+  theme:
+    # light | dark | system
+    default: system
+    displayToggle: true
+    
+  # Display the last modification info
+  displayUpdatedDate: true
+  dateFormat: "January 2, 2006"
+  displayUpdatedAuthor: true
+
+  # Search
+  # flexsearch is enabled by default
+  search:
+    enable: true
+    type: flexsearch
+
+    flexsearch:
+      # index page by: content | summary | heading | title
+      index: content
+      # full | forward | reverse | strict
+      # https://github.com/nextapps-de/flexsearch/#tokenizer-prefix-search
+      tokenize: reverse
+
+  blog:
+    list:
+      displayTags: true
+      # date | lastmod | publishDate | title | weight
+      sortBy: date
+      sortOrder: desc # or "asc"
+      # Pagination
+      pagerSize: 20
+
+    article:
+      displayPagination: true
+
+  toc:
+    displayTags: true
+
+  highlight:
+    copy:
+      enable: true
+      # hover | always
+      display: hover
+
+  page:
+    # full (100%), wide (90rem), normal (80rem)
+    width: normal
+    contextMenu:
+      enable: true
+      links:
+        - name: "Ask DeepSeek"
+          url: "https://chat.deepseek.com"
+          icon: "chat"
+    # tabs:
+    #   sync: true
+
+  comments:
+    enable: false
+    type: giscus
+
+    # https://giscus.app/
+    giscus:
+      repo: shafeiyu/library
+      repoId: R_kgDOSS-gng
+      category: Announcements
+      categoryId: DIC_kwDOSS-gns4C8POT
+      mapping: title
+      strict: 0
+      reactionsEnabled: 1
+      emitMetadata: 1
+      inputPosition: top
+      lang: zh-CN
+      loading: lazy
+      theme: noborder_light
+
+  imageZoom:
+    enable: true
+
+
+  archives:
+    section: docs
+    dateFormat: "Jan 02"
