@@ -10,19 +10,15 @@
 
 <script>
   twikoo.init({
-    {{- if .serverUrl }}
-    serverUrl: "{{ .serverUrl }}",
-    {{- else if .envId }}
+    {{- if .envId }}
     envId: "{{ .envId }}",
+    {{- else if .serverUrl }}
+    serverUrl: "{{ .serverUrl }}",
     {{- end }}
     el: "#twikoo-hextra",
     lang: "{{ .lang | default $lang }}",
     {{- with .path }}path: "{{ . }}",{{- else }}path: window.location.pathname,{{- end }}
     {{- with .region }}region: "{{ . }}",{{- end }}
-    onCommentLoaded: function () {
-      // Twikoo uses its own theme detection, but we can hook into
-      // the Hextra theme toggle to keep Twikoo in sync.
-    }
   });
 </script>
 {{- else -}}

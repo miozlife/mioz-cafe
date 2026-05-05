@@ -125,8 +125,8 @@ params:
 
     # https://twikoo.js.org/
     twikoo:
-      # Vercel 部署的 Twikoo 服务地址
-      serverUrl: https://twikoo.mioz.life
+      # Vercel 部署：将完整 URL 填入 envId
+      envId: https://twikoo.mioz.life
       lang: zh-CN
 
   imageZoom:
