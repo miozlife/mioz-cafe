@@ -1,7 +1,7 @@
 ---
 title: 随笔
 cascade:
-  type: blogs
+  type: blog
 ---
 
 随笔
