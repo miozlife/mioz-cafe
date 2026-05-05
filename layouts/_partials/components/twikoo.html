@@ -10,7 +10,11 @@
 
 <script>
   twikoo.init({
+    {{- if .serverUrl }}
+    serverUrl: "{{ .serverUrl }}",
+    {{- else if .envId }}
     envId: "{{ .envId }}",
+    {{- end }}
     el: "#twikoo-hextra",
     lang: "{{ .lang | default $lang }}",
     {{- with .path }}path: "{{ . }}",{{- else }}path: window.location.pathname,{{- end }}
@@ -22,5 +26,5 @@
   });
 </script>
 {{- else -}}
-  {{ warnf "twikoo is not configured. Set params.comments.twikoo.envId in hugo.yaml" }}
+  {{ warnf "twikoo is not configured. Set params.comments.twikoo.serverUrl or params.comments.twikoo.envId in hugo.yaml" }}
 {{- end -}}
