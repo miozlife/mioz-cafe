@@ -45,6 +45,24 @@
       </ul>
     {{ end -}}
 
+    {{- /* Download EPUB button - shown on book pages that have a companion .epub */ -}}
+    {{- with $context -}}
+      {{- if and .File (strings.HasSuffix .File.Path ".md") -}}
+        {{- $epubPath := replace .File.Path ".md" ".epub" -}}
+        {{- $epubFullPath := path.Join "content" $epubPath -}}
+        {{- if fileExists $epubFullPath -}}
+        <div class="hx:mt-4 hx:pt-4 hx:border-t hx:border-gray-200 hx:dark:border-neutral-800">
+          <a href="/{{ $epubPath }}" download class="hx:cursor-pointer hx:flex hx:items-center hx:gap-2 hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [-webkit-tap-highlight-color:transparent] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:w-full">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="hx:h-4 hx:w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            <span>下载 EPUB</span>
+          </a>
+        </div>
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+
   </div>
   {{/* Hide theme switch when sidebar is disabled */}}
   {{ $switchesClass := cond $disableSidebar "hx:md:hidden" "" -}}
