@@ -16,7 +16,7 @@ markup:
   highlight:
     noClasses: false
 
-defaultContentLanguage: 简体中文
+defaultContentLanguage: zh-cn
 
 menu:
   main:
