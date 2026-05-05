@@ -1,34 +1,33 @@
-// Sidebar action buttons: jump to comments
+// Sidebar action buttons: back to top & jump to comments
 
 document.addEventListener("DOMContentLoaded", function () {
-  const jumpToCommentsBtn = document.getElementById("sidebarJumpToComments");
-  const tocJumpToCommentsBtn = document.getElementById("tocJumpToComments");
-  const commentsEl = document.getElementById("twikoo-hextra");
-
-  // Jump to comments: hide buttons if no comments section on the page
-  if (!commentsEl) {
-    if (jumpToCommentsBtn) jumpToCommentsBtn.style.display = "none";
-    if (tocJumpToCommentsBtn) tocJumpToCommentsBtn.style.display = "none";
-  }
-
   // Always show backToTop button, override the theme's scroll-based toggle
   const backToTopBtn = document.getElementById("backToTop");
   if (backToTopBtn) {
-    // Remove immediately (theme's back-to-top.js may have already added opacity-0)
     backToTopBtn.classList.remove("hx:opacity-0");
     backToTopBtn.removeAttribute("tabindex");
-    // Keep removed on every scroll event as well
     document.addEventListener("scroll", function () {
       backToTopBtn.classList.remove("hx:opacity-0");
       backToTopBtn.removeAttribute("tabindex");
     });
   }
+
+  // Hide jump-to-comments buttons if page has no comment section.
+  // Delay check to let Twikoo fully initialize its container.
+  var buttons = ["sidebarJumpToComments", "tocJumpToComments"];
+  setTimeout(function () {
+    var hasComments = !!document.getElementById("twikoo-hextra");
+    buttons.forEach(function (id) {
+      var btn = document.getElementById(id);
+      if (btn && !hasComments) btn.style.display = "none";
+    });
+  }, 500);
 });
 
 function sidebarJumpToComments() {
-  const commentsEl = document.getElementById("twikoo-hextra");
+  var commentsEl = document.getElementById("twikoo-hextra") || document.querySelector("[id^='twikoo']");
   if (commentsEl) {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     commentsEl.scrollIntoView({
       behavior: prefersReducedMotion ? "auto" : "smooth",
       block: "start",
