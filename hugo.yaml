@@ -27,7 +27,7 @@ menu:
       pageRef: /inks
       weight: 2
     - name: 关于
-      pageRef: /about
+      pageRef: /intro
       weight: 3
     - name: Search
       weight: 4
