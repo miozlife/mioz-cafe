@@ -26,9 +26,9 @@ menu:
     - name: 随笔
       pageRef: /inks
       weight: 2
-    - identifier: more
-      name: 更多
-      pageRef: /more
+    - identifier: tags
+      name: 标签
+      pageRef: /tags
       weight: 96
     - name: 介绍
       pageRef: /intro
@@ -37,14 +37,6 @@ menu:
       weight: 99
       params:
         type: search
-    - identifier: tags
-      name: 标签分类
-      pageRef: /tags
-      parent: more
-    - identifier: archives
-      name: 归档
-      pageRef: /archives
-      parent: more
 
   sidebar:
     - identifier: more
