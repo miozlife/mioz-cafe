@@ -1,0 +1,36 @@
+{{ define "main" }}
+  <div class='hx:mx-auto hx:flex hextra-max-page-width'>
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" true) }}
+    {{ partial "toc.html" (dict "Params" (dict "toc" false)) }}
+    <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
+      <main id="content" class="hx:w-full hx:min-w-0 hextra-max-content-width hx:px-6 hx:pt-4 hx:md:px-12">
+        <br class="hx:mt-1.5 hx:text-sm" />
+        {{ if .Title }}<h1 class="hx:text-center hx:mt-2 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-slate-900 hx:dark:text-slate-100">{{ .Title }}</h1>{{ end }}
+        <div class="hx:mb-10"></div>
+        <div class="content">
+          {{ .Content }}
+        </div>
+        <div class="hx:grid hx:grid-cols-2 hx:md:grid-cols-3 hx:lg:grid-cols-4 hx:gap-4 hx:mt-4">
+          {{- range .Pages -}}
+            {{- /* Derive cover path from file name (same logic as update.py) */ -}}
+            {{- $name := .File.TranslationBaseName -}}
+            {{- $name = replace $name "：" "_" -}}
+            {{- $name = replace $name ":" "_" -}}
+            {{- $name = replace $name "（" "_" -}}
+            {{- $name = replace $name "）" "_" -}}
+            {{- $name = replace $name "(" "_" -}}
+            {{- $name = replace $name ")" "_" -}}
+            {{- $coverPath := printf "/covers/%s.jpg" $name -}}
+
+            <a href="{{ .RelPermalink }}" class="hextra-card hx:group hx:flex hx:flex-col hx:justify-start hx:overflow-hidden hx:rounded-lg hx:border hx:border-gray-200 hx:text-current hx:no-underline hx:dark:shadow-none hx:hover:shadow-gray-100 hx:dark:hover:shadow-none hx:shadow-gray-100 hx:active:shadow-sm hx:active:shadow-gray-200 hx:transition-all hx:duration-200 hx:hover:border-gray-300 hx:bg-gray-100 hx:shadow-sm hx:dark:border-neutral-700 hx:dark:bg-neutral-800 hx:dark:text-gray-50 hx:hover:shadow-lg hx:dark:hover:border-neutral-500 hx:dark:hover:bg-neutral-700">
+              {{- if fileExists (printf "static%s" $coverPath) -}}
+              <img src="{{ $coverPath }}" alt="{{ .Title }}" class="hextra-card-image" loading="lazy" style="max-height:180px;object-fit:contain" />
+              {{- end -}}
+              <span class="hextra-card-icon hx:flex hx:font-semibold hx:items-start hx:gap-2 hx:p-4 hx:text-gray-700 hx:hover:text-gray-900 hx:dark:text-neutral-200 hx:dark:hover:text-neutral-50">{{ .Title }}</span>
+            </a>
+          {{- end -}}
+        </div>
+      </main>
+    </article>
+  </div>
+{{ end }}
