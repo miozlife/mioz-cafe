@@ -12,6 +12,7 @@ import re
 import sys
 import subprocess
 import zipfile
+from datetime import datetime
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -32,6 +33,22 @@ def short_title(filename: str) -> str:
     return re.sub(r"[（(].*", "", name).strip() or name
 
 
+def parse_front_matter(text: str) -> dict[str, str]:
+    """Parse simple YAML front matter: extract key/value pairs between '---' delimiters."""
+    result = {}
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return result
+    for line in lines[1:]:
+        line = line.strip()
+        if line == "---":
+            break
+        if ":" in line:
+            key, _, val = line.partition(":")
+            result[key.strip()] = val.strip()
+    return result
+
+
 def generate_md_pages(force: bool):
     """Scan content/ for .epub files and generate sibling .md pages."""
     epubs = sorted(CONTENT_DIR.rglob("*.epub"))
@@ -49,6 +66,8 @@ def generate_md_pages(force: bool):
         md_path = dir_path / f"{epub_stem}.md"
         title = short_title(epub_filename)
 
+        existing = {}
+        is_new = False
         if md_path.exists():
             text = md_path.read_text(encoding="utf-8")
             if MARKER_MD in text:
@@ -57,16 +76,30 @@ def generate_md_pages(force: bool):
                     skipped += 1
                     continue
                 print(f"  Regenerate (--force): {md_path.relative_to(PROJECT_ROOT)}")
+                # Read existing front matter to preserve user edits
+                existing = parse_front_matter(text)
             else:
                 print(f"  Skip (manual, preserve): {md_path.relative_to(PROJECT_ROOT)}")
                 skipped += 1
                 continue
         else:
             print(f"  Generate: {md_path.relative_to(PROJECT_ROOT)}  ({title})")
+            is_new = True
+
+        folder_name = dir_path.name
+        date_str = existing.get("weight") or datetime.now().strftime("%Y%m%d")
+        comments_val = existing.get("comments", "true")
+        tags_val = existing.get("tags", f'["{folder_name}"]')
+
+        # Build front matter
+        fm = f'---\ntitle: "{title}"\ntype: docs\n'
+        fm += f"weight: {date_str}\n"
+        fm += f"comments: {comments_val}\n"
+        fm += f"tags: {tags_val}\n"
+        fm += "---\n"
 
         md_path.write_text(
-            f'---\ntitle: "{title}"\ntype: docs\n---\n\n'
-            f"{MARKER_MD}\n\n"
+            fm + f"\n{MARKER_MD}\n\n"
             f'{{{{< epub-reader "{epub_filename}" >}}}}\n',
             encoding="utf-8",
         )
