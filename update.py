@@ -212,11 +212,10 @@ def save_cover(cover_data: bytes, epub_stem: str, mime: str) -> str | None:
 
 
 def make_slug(filename: str) -> str:
-    """Turn a filename into Hugo-compatible slug (strip ：：（）())."""
-    slug = filename
-    for ch in "：:（）()":
-        slug = slug.replace(ch, "")
-    return slug
+    """Turn a filename into Hugo-compatible slug.
+    Strips characters that Hugo removes from Chinese slugs:
+    punctuation, spaces, dots, and other non-CJK/non-alphanumeric chars."""
+    return re.sub(r"[^\u4e00-\u9fffa-zA-Z0-9-]", "", filename)
 
 
 def read_front_matter(index_path: Path) -> list[str]:
