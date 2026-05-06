@@ -5,10 +5,17 @@
   font-family: inherit;
 }
 
-/* TOC layout: flex column to pin button at bottom with independent heading scroll */
+/* TOC layout: flex column to pin button at bottom with independent heading scroll.
+   Hidden < 80rem, visible at xl+ to preserve Hextra's responsive behavior. */
 .hextra-toc {
-  display: flex;
-  flex-direction: column;
+  display: none;
+}
+
+@media (min-width: 80rem) {
+  .hextra-toc {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .hextra-toc-scroll-wrapper {
