@@ -33,19 +33,55 @@ def short_title(filename: str) -> str:
     return re.sub(r"[（(].*", "", name).strip() or name
 
 
+def parse_tags(raw: str) -> list[str]:
+    """Parse tags from inline array `["a","b"]` or YAML list `- a\n- b`."""
+    raw = raw.strip()
+    # Inline array format: ["a", "b"]
+    if raw.startswith("["):
+        cleaned = raw.strip("[]")
+        return [t.strip().strip("'\"") for t in cleaned.split(",") if t.strip()]
+    # YAML list format: "  - a\n  - b" or "- a"
+    items = []
+    for line in raw.splitlines():
+        line = line.strip()
+        if line.startswith("- "):
+            items.append(line[2:].strip().strip("'\""))
+    return items
+
+
 def parse_front_matter(text: str) -> dict[str, str]:
-    """Parse simple YAML front matter: extract key/value pairs between '---' delimiters."""
+    """Parse simple YAML front matter: extract key/value pairs between '---' delimiters.
+    Handles multi-line YAML lists for the 'tags' key."""
     result = {}
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
         return result
+    current_key = None
+    tag_lines = []
     for line in lines[1:]:
-        line = line.strip()
-        if line == "---":
+        stripped = line.strip()
+        if stripped == "---":
             break
-        if ":" in line:
-            key, _, val = line.partition(":")
-            result[key.strip()] = val.strip()
+        if current_key == "tags":
+            if stripped.startswith("- "):
+                tag_lines.append(line)
+                continue
+            else:
+                current_key = None
+                if tag_lines:
+                    result["tags"] = "\n".join(tag_lines)
+                    tag_lines = []
+        if ":" in stripped:
+            key, _, val = stripped.partition(":")
+            key = key.strip()
+            val = val.strip()
+            if key == "tags" and not val:
+                current_key = "tags"
+                tag_lines = []
+            else:
+                result[key] = val
+    if tag_lines:
+        result["tags"] = "\n".join(tag_lines)
     return result
 
 
@@ -89,13 +125,15 @@ def generate_md_pages(force: bool):
         folder_name = dir_path.name
         date_str = existing.get("weight") or datetime.now().strftime("%Y%m%d")
         comments_val = existing.get("comments", "true")
-        tags_val = existing.get("tags", f'["{folder_name}"]')
+        tags_list = parse_tags(existing.get("tags") or f'["{folder_name}"]')
 
         # Build front matter
         fm = f'---\ntitle: "{title}"\ntype: docs\n'
         fm += f"weight: {date_str}\n"
         fm += f"comments: {comments_val}\n"
-        fm += f"tags: {tags_val}\n"
+        fm += "tags:\n"
+        for t in tags_list:
+            fm += f"  - {t}\n"
         fm += "---\n"
 
         md_path.write_text(
