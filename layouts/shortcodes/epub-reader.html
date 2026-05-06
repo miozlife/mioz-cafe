@@ -43,6 +43,31 @@
     flow: "scrolled"
   });
 
+  // ---- Prevent epub internal links from leaking to parent window (mobile 404 fix) ----
+  var iframeObserver = new MutationObserver(function() {
+    var iframe = viewer.querySelector('iframe');
+    if (iframe && !iframe._patched) {
+      iframe._patched = true;
+      iframe.addEventListener('load', function() {
+        try {
+          var doc = iframe.contentDocument || iframe.contentWindow.document;
+          if (doc) {
+            doc.addEventListener('click', function(e) {
+              var a = e.target.closest('a');
+              if (!a || !a.href || a.href.startsWith('javascript:')) return;
+              // Block navigation targeting parent window (mobile Safari sends epub anchor clicks to top)
+              var t = a.getAttribute('target') || '';
+              if ((!t || t === '_parent' || t === '_top') && !a.href.startsWith('blob:')) {
+                e.preventDefault();
+              }
+            }, true);
+          }
+        } catch(ex) {}
+      });
+    }
+  });
+  iframeObserver.observe(viewer, { childList: true, subtree: true });
+
   // ---- Load, render, auto-resize iframe ----
   book.ready.then(function() {
     if (loading) loading.style.display = "none";
