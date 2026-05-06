@@ -25,6 +25,15 @@
 
     {{/* Back to top & Jump to comments - always pinned at bottom */}}
     <div class="hx:shrink-0 hx:flex hx:flex-col hx:py-2 hx:border-t hx:border-gray-200 hx:dark:border-neutral-800">
+      {{- if and site.Params.toc.displayTags .Params.tags -}}
+      <div class="hx:flex hx:items-start hx:gap-x-2 hx:text-xs hx:mb-1">
+        <div class="hx:font-medium hx:text-gray-500 hx:dark:text-gray-400 hx:shrink-0">{{ $tags }}</div>
+        <div class="hx:flex hx:flex-wrap hx:gap-1">
+          {{ partial "tags.html" (dict "context" .) }}
+        </div>
+      </div>
+      {{- end -}}
+
       <button id="backToTop" onClick="scrollUp();" class="hx:cursor-pointer hx:text-xs hx:font-medium hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-100 hx:contrast-more:text-gray-800 hx:contrast-more:dark:text-gray-50">
         <span>{{- $backToTop -}}</span>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false" class="hx:inline hx:ltr:ml-1 hx:rtl:mr-1 hx:h-3.5 hx:w-3.5 hx:rounded-full hx:border hx:border-gray-500 hx:hover:border-gray-900 hx:dark:border-gray-400 hx:dark:hover:border-gray-100 hx:contrast-more:border-gray-800 hx:contrast-more:dark:border-gray-50">
