@@ -26,8 +26,8 @@
     {{/* Back to top & Jump to comments - always pinned at bottom */}}
     <div class="hx:shrink-0 hx:flex hx:flex-col hx:items-start hx:py-2 hx:border-t hx:border-gray-200 hx:dark:border-neutral-800">
       {{- if and site.Params.toc.displayTags .Params.tags -}}
-      <div class="hx:flex hx:items-start hx:gap-x-2 hx:text-xs hx:mb-1">
-        <div class="hx:font-medium hx:text-gray-500 hx:dark:text-gray-400 hx:shrink-0">{{ $tags }}</div>
+      <div class="hx:flex hx:items-start hx:gap-x-2 hx:text-xs hx:font-medium hx:mb-1">
+        <div class="hx:text-gray-500 hx:dark:text-gray-400 hx:shrink-0">{{ $tags }}</div>
         <div class="hx:flex hx:flex-wrap hx:gap-1">
           {{ partial "tags.html" (dict "context" .) }}
         </div>
