@@ -1,5 +1,5 @@
 ---
-title: 外国历史
+title: 外国历史地理
 type: docs
 ---
 

@@ -18,13 +18,59 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 CONTENT_DIR = PROJECT_ROOT / "content"
+BOOKS_DIR = CONTENT_DIR / "books"
+EPUB_SRC_DIR = PROJECT_ROOT / "epub"
 STATIC_COVERS = PROJECT_ROOT / "static" / "covers"
 MARKER_MD = "<!-- EPUB_AUTO_GENERATED -->"
 MARKER_CARDS = "<!-- AUTO_GENERATED_CARDS -->"
 
 
 # ──────────────────────────────────────────────────────────────
+# Step 0: Sync EPUBs from epub/ into content/books/
+# ──────────────────────────────────────────────────────────────
+
+def sync_epubs():
+    """Copy EPUBs from epub/<category>/ to content/books/<category>/."""
+    if not EPUB_SRC_DIR.is_dir():
+        print("No epub/ directory found, skipping sync.")
+        print()
+        return
+
+    print("Syncing EPUBs from epub/ to content/books/...")
+    print()
+    copied = 0
+    skipped = 0
+
+    for cat_dir in sorted(EPUB_SRC_DIR.iterdir()):
+        if not cat_dir.is_dir() or cat_dir.name.startswith("."):
+            continue
+
+        category = cat_dir.name
+        dest_dir = BOOKS_DIR / category
+        epub_files = sorted(cat_dir.glob("*.epub"))
+        if not epub_files:
+            continue
+
+        print(f"  {category}/ ({len(epub_files)} EPUB(s))")
+        dest_dir.mkdir(parents=True, exist_ok=True)
+
+        for src in epub_files:
+            dest = dest_dir / src.name
+            if dest.exists():
+                print(f"    Skip (exists): {src.name}")
+                skipped += 1
+            else:
+                dest.write_bytes(src.read_bytes())
+                print(f"    Copy: {src.name}")
+                copied += 1
+
+    print(f"  Done: copied {copied}, skipped {skipped}")
+    print()
+
+
+# ──────────────────────────────────────────────────────────────
 # Step 1: Scan EPUBs and generate .md pages
+# ──────────────────────────────────────────────────────────────
 # ──────────────────────────────────────────────────────────────
 
 def short_title(filename: str) -> str:
@@ -404,6 +450,9 @@ def main():
     print("  Update")
     print("=" * 50)
     print()
+
+    # Step 0: Sync EPUBs from epub/ to content/books/
+    sync_epubs()
 
     # Step 1: Generate .md pages
     generate_md_pages(force)
