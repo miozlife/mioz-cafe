@@ -30,7 +30,7 @@ MARKER_CARDS = "<!-- AUTO_GENERATED_CARDS -->"
 # ──────────────────────────────────────────────────────────────
 
 def sync_epubs():
-    """Copy EPUBs from epub/<category>/ to content/books/<category>/."""
+    """Sync EPUBs between epub/ and content/books/: copy new, remove orphans."""
     if not EPUB_SRC_DIR.is_dir():
         print("No epub/ directory found, skipping sync.")
         print()
@@ -38,8 +38,11 @@ def sync_epubs():
 
     print("Syncing EPUBs from epub/ to content/books/...")
     print()
+
+    # ── Phase 1: copy new EPUBs ──
     copied = 0
     skipped = 0
+    source_files = set()  # track all (category, epub_name) from epub/
 
     for cat_dir in sorted(EPUB_SRC_DIR.iterdir()):
         if not cat_dir.is_dir() or cat_dir.name.startswith("."):
@@ -51,20 +54,48 @@ def sync_epubs():
         if not epub_files:
             continue
 
-        print(f"  {category}/ ({len(epub_files)} EPUB(s))")
+        print(f"  + {category}/ ({len(epub_files)} EPUB(s))")
         dest_dir.mkdir(parents=True, exist_ok=True)
 
         for src in epub_files:
+            source_files.add((category, src.name))
             dest = dest_dir / src.name
             if dest.exists():
-                print(f"    Skip (exists): {src.name}")
+                print(f"      Skip (exists): {src.name}")
                 skipped += 1
             else:
                 dest.write_bytes(src.read_bytes())
-                print(f"    Copy: {src.name}")
+                print(f"      Copy: {src.name}")
                 copied += 1
 
-    print(f"  Done: copied {copied}, skipped {skipped}")
+    # ── Phase 2: remove orphaned EPUBs (in content/books but not in epub/) ──
+    removed_epub = 0
+    removed_md = 0
+
+    if BOOKS_DIR.is_dir():
+        for cat_dir in sorted(BOOKS_DIR.iterdir()):
+            if not cat_dir.is_dir() or cat_dir.name.startswith("."):
+                continue
+            category = cat_dir.name
+            for epub_path in sorted(cat_dir.glob("*.epub")):
+                if (category, epub_path.name) in source_files:
+                    continue  # still in epub/
+
+                # Check if the .md file is auto-generated
+                md_path = cat_dir / f"{epub_path.stem}.md"
+                is_auto = False
+                if md_path.exists():
+                    is_auto = MARKER_MD in md_path.read_text(encoding="utf-8")
+
+                if is_auto or not md_path.exists():
+                    epub_path.unlink()
+                    removed_epub += 1
+                    print(f"  - Remove orphan: {category}/{epub_path.name}")
+                    if md_path.exists():
+                        md_path.unlink()
+                        removed_md += 1
+
+    print(f"  Summary: +{copied} copied, {skipped} skipped, -{removed_epub} removed")
     print()
 
 
@@ -297,9 +328,16 @@ def save_cover(cover_data: bytes, epub_stem: str, mime: str) -> str | None:
 
 def make_slug(filename: str) -> str:
     """Turn a filename into Hugo-compatible slug.
-    Strips characters that Hugo removes from Chinese slugs:
-    punctuation, spaces, dots, and other non-CJK/non-alphanumeric chars."""
-    return re.sub(r"[^\u4e00-\u9fffa-zA-Z0-9-]", "", filename)
+
+    Hugo's slug behavior:
+    1. Lowercase
+    2. Replace spaces with hyphens
+    3. Strip punctuation and other non-alphanumeric/non-CJK chars
+    """
+    slug = filename.lower()
+    slug = slug.replace(" ", "-")
+    slug = re.sub(r"[^\u4e00-\u9fffa-z0-9-]", "", slug)
+    return slug
 
 
 def read_front_matter(index_path: Path) -> list[str]:
